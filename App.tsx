@@ -6,8 +6,8 @@ import { RegisterScreen } from "./src/screens/RegisterScreen";
 function App() {
   return (
     <SafeAreaView style={globalStyles.background}>
-      <SignInScreen />
-      {/* <RegisterScreen /> */}
+      {/* <SignInScreen /> */}
+      <RegisterScreen />
     </SafeAreaView>
   );
 }
