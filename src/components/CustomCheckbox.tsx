@@ -1,19 +1,21 @@
-import React from "react";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
 import { AppColors } from "../constants/AppColors";
-import { AppSizes } from "../constants/AppSizes";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export const CustomCheckbox = () => {
-  return <TouchableOpacity style={styles.container}></TouchableOpacity>;
-};
+  const [check, setCheck] = useState<boolean>(false);
 
-const styles = StyleSheet.create({
-  container: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: AppColors.disabled,
-    borderRadius: AppSizes.radiusSM,
-  },
-});
-``;
+  return (
+    <TouchableOpacity
+      onPress={() => setCheck(!check)}
+      style={{ width: 24, height: 24 }}
+    >
+      <FontAwesome
+        name={check ? "check-square" : "square-o"}
+        size={24}
+        color={check ? AppColors.success : AppColors.disabled}
+      />
+    </TouchableOpacity>
+  );
+};

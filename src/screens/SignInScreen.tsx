@@ -1,30 +1,42 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { CustomCheckbox } from "../components/CustomCheckbox";
+import React, { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import { AppColors } from "../constants/AppColors";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { globalStyles } from "../../styles/global-styles";
+import { CustomCheckbox } from "../components/CustomCheckbox";
+import { CustomInputText } from "../components/CustomInputText";
+import { CustomButton } from "../components/CustomButton";
+import { CustomTextButton } from "../components/CustomTextButton";
+import { CustomLabel } from "../components/CustomLabel";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParams } from "../navigation/StackNavigator";
 
-export const SignInScreen = () => {
+type Props = StackScreenProps<RootStackParams, "SignIn">;
+
+interface FormLogin {
+  email: string;
+  password: string;
+}
+
+export const SignInScreen = ({ navigation }: Props) => {
+  const [formLogin, setFormLogin] = useState<FormLogin>({
+    email: "",
+    password: "",
+  });
+
+  const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
+
+  const handleLogin = () => {
+    //! Nota: La validacion de los campos la hago en el boton de "Iniciar sesion", si no estan completos el boton no se habilita
+    console.log(`SignIn: ${JSON.stringify(formLogin)}`);
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={loginScreentyles.container}>
       <View style={{ width: "100%" }}>
         <View style={{ gap: 5, marginBottom: 60 }}>
-          <Text
-            style={{
-              fontSize: 32,
-              fontWeight: "semibold",
-              color: AppColors.mainColorText,
-            }}
-          >
-            Bienvenido de nuevo!
-          </Text>
+          <Text style={globalStyles.title}>Bienvenido de nuevo!</Text>
           <Text
             style={{
               fontSize: 16,
@@ -37,31 +49,35 @@ export const SignInScreen = () => {
         </View>
         <View style={{ gap: 20 }}>
           <View>
-            <Text style={{ ...globalStyles.label, paddingLeft: 4 }}>Email</Text>
-            <View style={globalStyles.inputContainer}>
-              <TextInput
-                placeholder="Ingresa tu email"
-                style={globalStyles.inputLabel}
-              />
-            </View>
+            <CustomLabel title={"Email"} />
+            <CustomInputText
+              placeholder={"Ingresa tu email"}
+              property={"email"}
+              keyboardType={"default"}
+              onChangeText={(prop, value) =>
+                setFormLogin({ ...formLogin, [prop]: value })
+              }
+            />
           </View>
           <View>
-            <Text style={{ ...globalStyles.label, paddingLeft: 4 }}>
-              Contraseña
-            </Text>
-            <View style={globalStyles.inputContainer}>
-              <TextInput
-                placeholder="Ingresa tu contraseña"
-                style={globalStyles.inputLabel}
-              />
-              <TouchableOpacity>
+            <CustomLabel title={"Contraseña"} />
+            <CustomInputText
+              placeholder={"Ingresa tu contraseña"}
+              keyboardType="default"
+              property="password"
+              secureTextEntry={hiddenPassword}
+              onChangeText={(prop, value) =>
+                setFormLogin({ ...formLogin, [prop]: value })
+              }
+              onPress={() => setHiddenPassword(!hiddenPassword)}
+              suffixcon={
                 <FontAwesome5
-                  name="eye-slash"
+                  name={hiddenPassword ? "eye" : "eye-slash"}
                   size={18}
                   color={AppColors.gray2}
                 />
-              </TouchableOpacity>
-            </View>
+              }
+            />
           </View>
         </View>
         <View
@@ -73,36 +89,34 @@ export const SignInScreen = () => {
             marginTop: 16,
           }}
         >
-          <View style={styles.recordarmeContainer}>
+          <View style={loginScreentyles.recordarmeContainer}>
             <CustomCheckbox />
-            <Text style={styles.text}>Recordarme</Text>
+            <Text style={loginScreentyles.text}>Recordarme</Text>
           </View>
           <View>
-            <TouchableOpacity>
-              <Text style={globalStyles.linkText}>
-                ¿Olvidaste tu contraseña?
-              </Text>
-            </TouchableOpacity>
+            <CustomTextButton title={"¿Olvidaste tu contraseña?"} />
           </View>
         </View>
-        <TouchableOpacity
-          style={{ ...globalStyles.button, marginTop: 100 }}
-          onPress={() => {}}
-        >
-          <Text style={globalStyles.buttonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
+        <View style={{ marginTop: 100 }}>
+          <CustomButton
+            title={"Iniciar sesión"}
+            onPress={handleLogin}
+            disabled={formLogin.email === "" || formLogin.password === ""}
+          />
+        </View>
       </View>
-      <View style={styles.registrarContainer}>
-        <Text style={styles.text}>¿No tienes una cuenta?</Text>
-        <TouchableOpacity>
-          <Text style={globalStyles.linkText}>Regístrate aquí</Text>
-        </TouchableOpacity>
+      <View style={loginScreentyles.registrarContainer}>
+        <Text style={loginScreentyles.text}>¿No tienes una cuenta?</Text>
+        <CustomTextButton
+          title={"Registrate aquí"}
+          onPress={() => navigation.navigate("Register")}
+        />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
+const loginScreentyles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -111,8 +125,8 @@ const styles = StyleSheet.create({
   },
   recordarmeContainer: {
     flexDirection: "row",
-    alignSelf: "flex-start",
     gap: 10,
+    alignItems: "center",
   },
   text: {
     fontSize: 14,

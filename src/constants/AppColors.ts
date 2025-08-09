@@ -7,4 +7,6 @@ export class AppColors {
 
   static gray1: string = "#E6E6E6";
   static gray2: string = "#999999";
+
+  static success: string = "#00C950";
 }

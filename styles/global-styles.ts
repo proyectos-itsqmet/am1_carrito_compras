@@ -44,4 +44,9 @@ export const globalStyles = StyleSheet.create({
     color: AppColors.mainColorText,
     fontWeight: "medium",
   },
+  title: {
+    fontSize: 32,
+    fontWeight: "semibold",
+    color: AppColors.mainColorText,
+  },
 });

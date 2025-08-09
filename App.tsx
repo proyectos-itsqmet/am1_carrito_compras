@@ -1,14 +1,11 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import { SignInScreen } from "./src/screens/SignInScreen";
-import { globalStyles } from "./styles/global-styles";
-import { RegisterScreen } from "./src/screens/RegisterScreen";
+import { NavigationContainer } from "@react-navigation/native";
+import { StackNavigator } from "./src/navigation/StackNavigator";
 
 function App() {
   return (
-    <SafeAreaView style={globalStyles.background}>
-      {/* <SignInScreen /> */}
-      <RegisterScreen />
-    </SafeAreaView>
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
   );
 }
 
