@@ -15,6 +15,7 @@ interface Props {
   secureTextEntry?: boolean;
   keyboardType: KeyboardTypeOptions;
   suffixcon?: React.ReactNode;
+  value?: string;
 }
 
 export const CustomInputText = ({
@@ -25,6 +26,7 @@ export const CustomInputText = ({
   secureTextEntry = false,
   keyboardType,
   suffixcon,
+  value,
 }: Props) => {
   return (
     <View style={globalStyles.inputContainer}>
@@ -33,6 +35,7 @@ export const CustomInputText = ({
         onChangeText={(value) => onChangeText(property, value)}
         keyboardType={keyboardType}
         secureTextEntry={secureTextEntry}
+        value={value}
       />
       <TouchableOpacity onPress={onPress}>
         {suffixcon && <View>{suffixcon}</View>}

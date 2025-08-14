@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { AppColors } from "../constants/AppColors";
 import { globalStyles } from "../../styles/global-styles";
 import { CustomCheckbox } from "../components/CustomCheckbox";
@@ -9,27 +9,55 @@ import { CustomTextButton } from "../components/CustomTextButton";
 import { CustomLabel } from "../components/CustomLabel";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StackScreenProps } from "@react-navigation/stack";
-import { RootStackParams } from "../navigation/StackNavigator";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { User } from "../interfaces/User";
+import { FormLogin } from "../interfaces/FormLogin";
 
-type Props = StackScreenProps<RootStackParams, "SignIn">;
-
-interface FormLogin {
-  email: string;
-  password: string;
+interface SignInScreenProps {
+  newUser: FormLogin | null;
+  users: User[];
 }
 
-export const SignInScreen = ({ navigation }: Props) => {
-  const [formLogin, setFormLogin] = useState<FormLogin>({
-    email: "",
-    password: "",
+export const SignInScreen = ({ newUser, users }: SignInScreenProps) => {
+  const navigation = useNavigation();
+
+  const [formSignIn, setFormSignIn] = useState<FormLogin>({
+    email: "garaque@correo.com.ec",
+    password: "123456",
   });
+
+  useEffect(() => {
+    if (newUser) {
+      setFormSignIn({
+        email: newUser.email,
+        password: newUser.password,
+      });
+    }
+  }, [newUser]);
 
   const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
 
+  const veriftyUser = (): User | undefined => {
+    const existUser = users.find(
+      (user) =>
+        user.email === formSignIn.email && user.password === formSignIn.password
+    );
+
+    return existUser;
+  };
+
   const handleLogin = () => {
-    //! Nota: La validacion de los campos la hago en el boton de "Iniciar sesion", si no estan completos el boton no se habilita
-    console.log(`SignIn: ${JSON.stringify(formLogin)}`);
+    if (veriftyUser() === undefined) {
+      Alert.alert("Alerta!", "Usuario o contraseña incorrectos");
+      return;
+    }
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      })
+    );
   };
 
   return (
@@ -54,8 +82,9 @@ export const SignInScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu email"}
               property={"email"}
               keyboardType={"default"}
+              value={formSignIn.email}
               onChangeText={(prop, value) =>
-                setFormLogin({ ...formLogin, [prop]: value })
+                setFormSignIn({ ...formSignIn, [prop]: value })
               }
             />
           </View>
@@ -65,9 +94,10 @@ export const SignInScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu contraseña"}
               keyboardType="default"
               property="password"
+              value={formSignIn.password}
               secureTextEntry={hiddenPassword}
               onChangeText={(prop, value) =>
-                setFormLogin({ ...formLogin, [prop]: value })
+                setFormSignIn({ ...formSignIn, [prop]: value })
               }
               onPress={() => setHiddenPassword(!hiddenPassword)}
               suffixcon={
@@ -101,7 +131,7 @@ export const SignInScreen = ({ navigation }: Props) => {
           <CustomButton
             title={"Iniciar sesión"}
             onPress={handleLogin}
-            disabled={formLogin.email === "" || formLogin.password === ""}
+            disabled={formSignIn.email === "" || formSignIn.password === ""}
           />
         </View>
       </View>
@@ -109,7 +139,9 @@ export const SignInScreen = ({ navigation }: Props) => {
         <Text style={loginScreentyles.text}>¿No tienes una cuenta?</Text>
         <CustomTextButton
           title={"Registrate aquí"}
-          onPress={() => navigation.navigate("Register")}
+          onPress={() =>
+            navigation.dispatch(CommonActions.navigate({ name: "Register" }))
+          }
         />
       </View>
     </SafeAreaView>

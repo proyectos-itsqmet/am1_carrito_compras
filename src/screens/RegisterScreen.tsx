@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AppColors } from "../constants/AppColors";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { CustomLabel } from "../components/CustomLabel";
@@ -7,10 +7,13 @@ import { CustomButton } from "../components/CustomButton";
 import { CustomTextButton } from "../components/CustomTextButton";
 import { CustomInputText } from "../components/CustomInputText";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StackScreenProps } from "@react-navigation/stack";
-import { RootStackParams } from "../navigation/StackNavigator";
+import { User } from "../interfaces/User";
+import { useNavigation } from "@react-navigation/native";
 
-type Props = StackScreenProps<RootStackParams, "Register">;
+interface RegisterScreenProps {
+  users: User[];
+  addUser: (user: User) => void;
+}
 
 interface FormRegister {
   name: string;
@@ -20,23 +23,59 @@ interface FormRegister {
   confirmPassword: string;
 }
 
-export const RegisterScreen = ({ navigation }: Props) => {
+export const RegisterScreen = ({ users, addUser }: RegisterScreenProps) => {
+  const navigation = useNavigation();
+
   const [formRegister, setFormRegister] = useState<FormRegister>({
-    name: "",
-    phone: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+    name: "Yermain Paredes",
+    phone: "0654987321",
+    email: "yparedes@correo.com.ec",
+    password: "123456",
+    confirmPassword: "123456",
+    // name: "",
+    // phone: "",
+    // email: "",
+    // password: "",
+    // confirmPassword: "",
   });
 
   const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
   const [hiddenConfirmPassword, setHiddenConfirmPassword] =
     useState<boolean>(true);
 
+  const verifyUsername = (): User | undefined => {
+    const existUsername = users.find(
+      (user) => user.email === formRegister.email
+    );
+
+    return existUsername;
+  };
+
+  const getIdUser = (): number => {
+    const getId = users.length + 1;
+    return getId;
+  };
+
   const handleRegister = () => {
     //! Nota: La validacion de los campos la hago en el boton de "Registrarse", si no estan completos el boton no se habilita
-    console.log(`Register: ${JSON.stringify(formRegister)}`);
-    navigation.navigate("SignIn");
+    if (verifyUsername() != undefined) {
+      Alert.alert("Error", "El usuario ya existe");
+      return;
+    }
+
+    const newUser: User = {
+      id: getIdUser(),
+      fullName: formRegister.name,
+      phone: formRegister.phone,
+      email: formRegister.email,
+      password: formRegister.password,
+    };
+
+    addUser(newUser);
+
+    Alert.alert("Exito!", "Usuario registrado con exito");
+
+    navigation.goBack();
   };
 
   return (
@@ -69,6 +108,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu nombre completo"}
               property={"name"}
               keyboardType={"default"}
+              value={formRegister.name}
               onChangeText={(prop, value) =>
                 setFormRegister({ ...formRegister, [prop]: value })
               }
@@ -80,6 +120,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu numero de celular"}
               property={"phone"}
               keyboardType={"default"}
+              value={formRegister.phone}
               onChangeText={(prop, value) =>
                 setFormRegister({ ...formRegister, [prop]: value })
               }
@@ -91,6 +132,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu email"}
               property={"email"}
               keyboardType={"default"}
+              value={formRegister.email}
               onChangeText={(prop, value) =>
                 setFormRegister({ ...formRegister, [prop]: value })
               }
@@ -102,6 +144,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
               placeholder={"Ingresa tu contraseña"}
               keyboardType="default"
               property="password"
+              value={formRegister.password}
               secureTextEntry={hiddenPassword}
               onChangeText={(prop, value) =>
                 setFormRegister({ ...formRegister, [prop]: value })
@@ -122,6 +165,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
               placeholder={"Confirma tu contraseña"}
               keyboardType="default"
               property="confirmPassword"
+              value={formRegister.confirmPassword}
               secureTextEntry={hiddenConfirmPassword}
               onChangeText={(prop, value) =>
                 setFormRegister({ ...formRegister, [prop]: value })
@@ -161,7 +205,7 @@ export const RegisterScreen = ({ navigation }: Props) => {
         <TouchableOpacity>
           <CustomTextButton
             title={"Inicia sesión"}
-            onPress={() => navigation.navigate("SignIn")}
+            onPress={() => navigation.goBack()}
           />
         </TouchableOpacity>
       </View>
