@@ -65,13 +65,7 @@ export const SignInScreen = ({ newUser, users }: SignInScreenProps) => {
       <View style={{ width: "100%" }}>
         <View style={{ gap: 5, marginBottom: 60 }}>
           <Text style={globalStyles.title}>Bienvenido de nuevo!</Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "regular",
-              color: AppColors.secondaryColor,
-            }}
-          >
+          <Text style={globalStyles.description}>
             Inicia sesión con tu cuenta
           </Text>
         </View>

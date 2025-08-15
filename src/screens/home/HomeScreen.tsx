@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,18 +14,38 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { Product } from "../../interfaces/Products";
-import { products } from "../../constants/Products";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { globalStyles } from "../../../styles/global-styles";
 import { ProductCard } from "./components/ProductCard";
 import { CustomInputText } from "../../components/CustomInputText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AppColors } from "../../constants/AppColors";
+import { CategoryMenu } from "./components/CategoryMenu";
+import { Wishlist } from "../../interfaces/Wishlist";
+import { Cart } from "../../interfaces/Cart";
 
-export const HomeScreen = () => {
+interface HomeScreenProps {
+  products: Product[];
+  wishlist: Wishlist[];
+  setWishlist: (product: Wishlist) => void;
+  cart: Cart[];
+  addCart: (product: Product, quantity: number) => void;
+}
+
+export const HomeScreen = ({
+  products,
+  wishlist,
+  setWishlist,
+  cart,
+  addCart,
+}: HomeScreenProps) => {
   const navigation = useNavigation();
+  const [lisProducts, setListProducts] = useState<Product[]>(products);
 
-  const [productList, setProductList] = useState<Product[]>(products);
+  useEffect(() => {
+    //TODO: AL AGREGAR PRODUCTO SE BORRA EL FILTRO
+    setListProducts(products);
+  }, [products]);
 
   //! Cerrar sesion
   useFocusEffect(
@@ -50,18 +70,56 @@ export const HomeScreen = () => {
     }, [navigation])
   );
 
+  const handleSortListProducts = (category: string) => {
+    if (category === "Todo") {
+      setListProducts(products);
+    } else {
+      const filter = products.filter((p) => p.category === category);
+      setListProducts(filter);
+    }
+  };
+
+  const handleSearch = (value: string) => {
+    if (value === "") {
+      setListProducts(products);
+    } else {
+      const filter = products.filter((p) =>
+        p.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setListProducts(filter);
+    }
+  };
+
+  const handleWishlist = (idProduct: number) => {
+    const newProductWishlist: Wishlist = {
+      idProduct: idProduct,
+    };
+
+    setWishlist(newProductWishlist);
+  };
+
   return (
     <SafeAreaView style={homeScreenStyle.container}>
       <View style={homeScreenStyle.header}>
         <Text style={globalStyles.title}>Productos</Text>
-        <TouchableOpacity>
-          <MaterialIcons name="shopping-cart" size={24} color="black" />
+        <TouchableOpacity
+          style={homeScreenStyle.iconCartContainer}
+          onPress={() =>
+            navigation.dispatch(CommonActions.navigate({ name: "Cart" }))
+          }
+        >
+          <View>
+            <MaterialIcons name="shopping-cart" size={24} color="black" />
+          </View>
+          <View style={homeScreenStyle.textIconCartContainer}>
+            <Text style={homeScreenStyle.textIconCart}>{cart.length}</Text>
+          </View>
         </TouchableOpacity>
       </View>
       <View style={{ marginBottom: 16 }}>
         <CustomInputText
           placeholder={"Buscar..."}
-          onChangeText={() => {}}
+          onChangeText={(prop, value) => handleSearch(value)}
           property={"buscar"}
           keyboardType={"default"}
           suffixcon={
@@ -73,14 +131,25 @@ export const HomeScreen = () => {
           }
         />
       </View>
+      <CategoryMenu onPress={(category) => handleSortListProducts(category)} />
       <FlatList
-        data={productList}
+        data={lisProducts}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
-        columnWrapperStyle={{ gap: 24 }}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
         contentContainerStyle={{ paddingBottom: 200 }}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <ProductCard product={item} />}
+        renderItem={({ item }) => {
+          const isWishlist = wishlist.some((w) => w.idProduct === item.id);
+          return (
+            <ProductCard
+              product={item}
+              isWishlist={isWishlist}
+              setWishlist={() => handleWishlist(item.id)}
+              addCart={addCart}
+            />
+          );
+        }}
       />
     </SafeAreaView>
   );
@@ -94,5 +163,22 @@ const homeScreenStyle = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  iconCartContainer: {},
+  textIconCartContainer: {
+    position: "absolute",
+    backgroundColor: AppColors.error,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    top: -6,
+    right: -6,
+  },
+  textIconCart: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 10,
   },
 });

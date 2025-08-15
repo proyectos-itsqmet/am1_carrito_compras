@@ -9,6 +9,7 @@ import { CustomInputText } from "../components/CustomInputText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { User } from "../interfaces/User";
 import { useNavigation } from "@react-navigation/native";
+import { globalStyles } from "../../styles/global-styles";
 
 interface RegisterScreenProps {
   users: User[];
@@ -91,13 +92,7 @@ export const RegisterScreen = ({ users, addUser }: RegisterScreenProps) => {
           >
             Crea tu cuenta!
           </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "regular",
-              color: AppColors.secondaryColor,
-            }}
-          >
+          <Text style={globalStyles.description}>
             Regístrate para comenzar a comprar
           </Text>
         </View>

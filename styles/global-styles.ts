@@ -49,4 +49,26 @@ export const globalStyles = StyleSheet.create({
     fontWeight: "semibold",
     color: AppColors.mainColorText,
   },
+  separator: {
+    height: 1,
+    backgroundColor: AppColors.gray1,
+    marginVertical: 6,
+  },
+  containerModal: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: AppSizes.radiusXL,
+    padding: 15,
+    alignItems: "center",
+  },
+  description: {
+    fontSize: 16,
+    fontWeight: "regular",
+    color: AppColors.secondaryColor,
+  },
 });

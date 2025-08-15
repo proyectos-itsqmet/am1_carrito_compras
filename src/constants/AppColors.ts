@@ -11,4 +11,5 @@ export class AppColors {
   static gray4: string = "#f5f5f5ff";
 
   static success: string = "#00C950";
+  static error: string = "#FB2C36";
 }
